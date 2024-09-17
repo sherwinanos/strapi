@@ -1,23 +1,28 @@
-import { Button } from "@/components/ui/button"
-
 async function getStrapiData(path: string) {
-  const baseUrl = "http://localhost:1337"
+  const baseUrl = "http://127.0.0.1:1337";
   try {
-    const response = await fetch(baseUrl + path)
-    const data = await response.json()
-    return data
+    const response = await fetch(baseUrl + path);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
 }
 
 export default async function Home() {
-  const strapiData = await getStrapiData("/api/home-page")
-  console.log('Strapi Data:', strapiData)
+  const strapiData = await getStrapiData("/api/home-page");
+
+  if (!strapiData || !strapiData.data) {
+    console.error("Invalid response structure:", strapiData);
+    return <div>Error loading data</div>;
+  }
+
+  const { title, description } = strapiData.data;
 
   return (
     <main className="container mx-auto py-6">
-      <Button>Learn more</Button>
+      <h1 className="text-5xl font-bold">{title}</h1>
+      <p className="text-xl mt-4">{description}</p>
     </main>
   );
 }
