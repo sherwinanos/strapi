@@ -1,28 +1,24 @@
-async function getStrapiData(path: string) {
-  const baseUrl = "http://127.0.0.1:1337";
-  try {
-    const response = await fetch(baseUrl + path);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(error);
+import { getHomePageData } from "@/data/loaders";
+
+import { HeroSection } from "@/components/custom/HeroSection";
+import { FeatureSection } from "@/components/custom/FeatureSection";
+
+function blockRenderer(block: any) {
+  switch (block.__component) {
+    case "layout.hero-section":
+      return <HeroSection key={block.id} data={block} />;
+    case "layout.feature-section":
+      return <FeatureSection key={block.id} data={block} />;
+    default:
+      return null;
   }
 }
 
 export default async function Home() {
-  const strapiData = await getStrapiData("/api/home-page");
+  const strapiData = await getHomePageData();
 
-  if (!strapiData || !strapiData.data) {
-    console.error("Invalid response structure:", strapiData);
-    return <div>Error loading data</div>;
-  }
+  const { blocks } = strapiData;
+  if (!blocks) return <p>No sections found</p>;
 
-  const { title, description } = strapiData.data;
-
-  return (
-    <main className="container mx-auto py-6">
-      <h1 className="text-5xl font-bold">{title}</h1>
-      <p className="text-xl mt-4">{description}</p>
-    </main>
-  );
+  return <main>{blocks.map(blockRenderer)}</main>;
 }
